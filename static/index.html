@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Triangle Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Triangle Existence Calculator</h1>
+
+    <form id="triangle-form">
+        <div class="form-group">
+            <label for="x-input">Side X:</label>
+            <input type="number" id="x-input" step="any" required>
+        </div>
+
+        <div class="form-group">
+            <label for="y-input">Side Y:</label>
+            <input type="number" id="y-input" step="any" required>
+        </div>
+
+        <div class="form-group">
+            <label for="r-input">Side R:</label>
+            <input type="number" id="r-input" step="any" required>
+        </div>
+
+        <button type="submit">Calculate</button>
+    </form>
+
+    <div id="error-message" class="error"></div>
+
+    <h2>Results</h2>
+    <table id="results-table">
+        <thead>
+        <tr>
+            <th>Side X</th>
+            <th>Side Y</th>
+            <th>Side R</th>
+            <th>Result</th>
+            <th>Response Time</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- Results will be inserted here by JavaScript -->
+        </tbody>
+    </table>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
