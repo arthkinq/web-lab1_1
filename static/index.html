@@ -5,122 +5,233 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Area Check</title>
     <style>
-        /* General Body and Layout Styles */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            font-family: fantasy, "Roboto", "Open Sans", Arial, sans-serif;
+            background-color: #faf7fc;
+            color: #2d1b36;
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
+            min-height: 90vh;
             margin: 0;
-            padding: 20px;
+            letter-spacing: 1px;
+            overflow-x: hidden;
         }
 
-        .container {
-            background: #fff;
-            padding: 2em;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 1200px; /* Увеличили ширину для двух колонок */
-        }
-
-        /* ID Selector for Header */
         #page-header {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
             width: 100%;
-            text-align: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #4a4a4a;
-            border-radius: 8px;
+            margin-bottom: 1%;
+            padding: 0.3%;
+            background-color: #1e293b;
+            color: #f8f7f9
         }
 
-        /* Descendant Selector for Header */
         #page-header h1 {
-            font-family: fantasy;
-            color: #ffffff;
-            font-size: 28px;
-            margin: 0;
-            padding: 5px 0;
-        }
-        #page-header p {
-            color: #dcdcdc;
-            margin: 0;
+            font-size: 1.5vw;
         }
 
-        /* --- NEW: Two-column layout --- */
+        #page-header p {
+            font-size: 1vw;
+        }
+
         #main-content {
             display: flex;
-            flex-wrap: wrap; /* Позволяет колонкам переноситься на маленьких экранах */
-            gap: 2em; /* Пространство между колонками */
+            flex-wrap: wrap;
+            gap: 1vw;
+            width: 90%;
+            justify-content: space-between;
         }
 
-        #controls-panel, #results-panel {
-            flex: 1; /* Колонки занимают равное пространство */
-            min-width: 350px; /* Минимальная ширина до переноса */
+        #controls-panel {
+            width: 30%;
         }
+
+        #results-panel {
+            width: 35%;
+        }
+
+        #controls-panel1 {
+            width: 32%;
+        }
+
 
         /* --- NEW: Header for results panel --- */
         .results-header {
             display: flex;
             justify-content: space-between; /* Заголовок слева, кнопка справа */
             align-items: center;
-            margin-bottom: 1em;
+            margin-bottom: 1%;
         }
+
         .results-header h2 {
             margin: 0;
         }
 
         /* --- NEW: Clear button style --- */
         #clear-button {
-            padding: 8px 16px;
-            background-color: #dc3545;
+            padding: 2% 11%;
+            background-color: #bf001a;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 0.8em;
             cursor: pointer;
             font-size: 0.9em;
             transition: background-color 0.2s;
         }
+
         #clear-button:hover {
-            background-color: #c82333;
+            background-color: #ff0018;
         }
 
         /* SVG Graph Styling */
         #graph-container {
-            margin: 0 auto 20px;
-            max-width: 400px;
+            margin: 0 auto 2%;
         }
-        .graph-area { fill: #5b99d4; stroke: #3a75b3; stroke-width: 1; }
-        .axis { stroke: #333; stroke-width: 2; }
-        .axis-label, .tick-label { font-family: monospace; font-size: 10px; fill: #000; }
-        .tick-line { stroke: #888; stroke-width: 1; }
-        #result-dot { transition: cx 0.3s, cy 0.3s; }
+
+        .graph-area {
+            fill: #6daded;
+            stroke: #3a75b3;
+            stroke-width: 1;
+        }
+
+        .axis {
+            stroke: #000000;
+            stroke-width: 2;
+        }
+
+        .axis-label, .tick-label {
+            font-family: monospace;
+            font-size: 10px;
+            fill: #000;
+        }
+
+        .tick-line {
+            stroke: #000000;
+            stroke-width: 1;
+        }
+
+        #result-dot {
+            transition: cx 0.3s, cy 0.3s;
+        }
 
         /* Form and Input Styling */
-        #main-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 2em; }
-        .form-section { padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
-        .form-section h3 { margin-top: 0; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
-        .input-group > label { display: block; margin-bottom: 0.5em; }
-        .radio-group, .button-group { display: flex; flex-wrap: wrap; gap: 10px; }
-        #y-input { width: 95%; margin-left: 2.5%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 1em; }
-        .r-button { padding: 10px 15px; border: 1px solid #007bff; background-color: #fff; color: #007bff; border-radius: 4px; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
+        #main-form {
+            display: flex;
+            flex-direction: column;
+            font-size: 2vh;
+        }
 
-.r-button:hover { background-color: #e2f1ff; }
-        .r-button.selected { background-color: #007bff; color: white; }
-        #submit-button { grid-column: 1 / -1; padding: 12px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 1.1em; font-weight: bold; }
-        #submit-button:hover { background-color: #218838; }
-        .error { color: #d9534f; text-align: center; margin-top: 1em; min-height: 1.2em; font-weight: bold; }
+        .form-section {
+            padding: 2%;
+            border: 1px solid rgb(122, 63, 159);
+            border-radius: 0.8em;
+            margin-bottom: 2%;
+        }
+
+        .form-section h3 {
+            border-bottom: 2px solid rgb(122, 63, 159);
+            padding-bottom: 3%;
+        }
+
+        .input-group > label {
+            display: block;
+            margin-bottom: 1%;
+        }
+
+        .radio-group, .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            font-size: 2vh;
+        }
+
+        .button-group {
+            justify-content: space-around;
+        }
+
+        #y-input {
+            width: 90%;
+            margin-left: 2.5%;
+            padding: 2%;
+            border: 1px solid #ccc;
+            border-radius: 0.8em;
+            font-size: 1em;
+        }
+
+        .r-button {
+            padding: 3% 4%;
+            border: 1px solid #007bff;
+            background-color: #fff;
+            border-radius: 0.4em;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+
+        .r-button:hover {
+            background-color: #e2f1ff;
+        }
+
+        .r-button.selected {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #submit-button {
+            /*grid-column: 1 / -1;*/
+            padding: 4% 2%;
+            background-color: #8a4baf;
+            color: white;
+            border: none;
+            border-radius:0.8em;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        #submit-button:hover {
+            background-color: #7a3f9f;
+        }
+
+        .error {
+            color: #aa0400;
+            text-align: center;
+            margin-top: 1%;
+            min-height: 1.2em;
+            font-weight: bold;
+        }
 
         /* Table Styling */
-        #results-table { width: 100%; border-collapse: collapse; margin-top: 1em; }
-        #results-table th, #results-table td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        #results-table thead { background-color: #4a4a4a; color: white; }
-        #results-table tbody tr:nth-child(even) { background-color: #f2f2f2; }
-        #results-table .hit-true { background-color: #d4edda; color: #155724; }
-        #results-table .hit-false { background-color: #f8d7da; color: #721c24; }
+        #results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1%;
+            margin-bottom: 10%;
+        }
+
+        #results-table th, #results-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+            min-width: 3vw;
+        }
+
+        #results-table thead {
+            background-color: #1e293b;
+            color: white;
+        }
+
+        #results-table .hit-true {
+            background-color: #bbc2ea;
+            color: #1e293b;
+        }
+
+        #results-table .hit-false {
+            background-color: #edb0b0;
+            color: #000000;
+        }
     </style>
 </head>
 <body>
@@ -129,92 +240,96 @@
     <p>ФИО: Сланов Артур | Группа: P3222 | Вариант: 467495</p>
 </header>
 
-<div class="container">
-    <!-- NEW: Main content wrapper for flexbox layout -->
-    <div id="main-content">
 
-        <!-- NEW: Left column for controls -->
-        <div id="controls-panel">
-            <div id="graph-container">
-                <svg id="graph" viewBox="-150 -150 300 300" xmlns="http://www.w3.org/2000/svg">
-                    <defs><marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#333" /></marker></defs>
-                    <g class="graph-area">
-                        <rect x="-100" y="0" width="100" height="100"></rect>
-                        <polygon points="0,0 50,0 0,100"></polygon>
-                        <path d="M 0 -50 A 50 50 0 0 1 50 0 L 0 0 Z"></path>
-                    </g>
-                    <line class="axis" x1="-140" y1="0" x2="140" y2="0" marker-end="url(#arrow)"></line>
-                    <line class="axis" x1="0" y1="140" x2="0" y2="-140" marker-end="url(#arrow)"></line>
-                    <text class="axis-label" x="135" y="-10">x</text>
-                    <text class="axis-label" y="-135" x="10">y</text>
-                    <g id="x-axis-ticks" class="tick-label" text-anchor="middle"></g>
-                    <g id="y-axis-ticks" class="tick-label" text-anchor="end"></g>
-                    <g id="dot-container"></g>
-                </svg>
+<div id="main-content">
+    <div id="controls-panel1">
+        <form id="main-form" method="POST">
+            <div class="form-section">
+                <h3>Выберите X:</h3>
+                <div class="radio-group">
+                    <label><input type="radio" name="x" value="-2" checked> -2</label>
+                    <label><input type="radio" name="x" value="-1.5"> -1.5</label>
+                    <label><input type="radio" name="x" value="-1"> -1</label>
+                    <label><input type="radio" name="x" value="-0.5"> -0.5</label>
+                    <label><input type="radio" name="x" value="0"> 0</label>
+                    <label><input type="radio" name="x" value="0.5"> 0.5</label>
+                    <label><input type="radio" name="x" value="1"> 1</label>
+                    <label><input type="radio" name="x" value="1.5"> 1.5</label>
+                    <label><input type="radio" name="x" value="2"> 2</label>
+                </div>
             </div>
+            <div class="form-section">
+                <h3>Введите Y (-3 ... 5):</h3>
+                <div class="input-group">
+                    <input type="text" id="y-input" name="y" placeholder="e.g., 2.5" required>
 
-            <form id="main-form" method="POST">
-                <div class="form-section">
-                    <h3>Выберите X:</h3>
-                    <div class="radio-group">
-                        <label><input type="radio" name="x" value="-2" checked> -2</label>
-                        <label><input type="radio" name="x" value="-1.5"> -1.5</label>
-                        <label><input type="radio" name="x" value="-1"> -1</label>
-                        <label><input type="radio" name="x" value="-0.5"> -0.5</label>
-                        <label><input type="radio" name="x" value="0"> 0</label>
-                        <label><input type="radio" name="x" value="0.5"> 0.5</label>
-                        <label><input type="radio" name="x" value="1"> 1</label>
-                        <label><input type="radio" name="x" value="1.5"> 1.5</label>
-                        <label><input type="radio" name="x" value="2"> 2</label>
-                    </div>
                 </div>
-                <div class="form-section">
-                    <h3>Введите Y (-3 ... 5):</h3>
-                    <div class="input-group">
-                        <input type="text" id="y-input" name="y" placeholder="e.g., 2.5" required>
-
-                    </div>
-                </div>
-                <div class="form-section">
-                    <h3>Выберите R:</h3>
-                    <div class="button-group" id="r-button-group">
-                        <button type="button" class="r-button" data-value="1">1</button>
-                        <button type="button" class="r-button" data-value="1.5">1.5</button>
-                        <button type="button" class="r-button" data-value="2">2</button>
-                        <button type="button" class="r-button" data-value="2.5">2.5</button>
-                        <button type="button" class="r-button" data-value="3">3</button>
-                    </div>
-                    <input type="hidden" id="r-input" name="r">
-                </div>
-                <button type="submit" id="submit-button">Проверить</button>
-            </form>
-            <div id="error-message" class="error"></div>
-        </div>
-
-        <!-- NEW: Right column for results -->
-        <div id="results-panel">
-            <div class="results-header">
-                <h2>Результаты</h2>
-                <button type="button" id="clear-button">Очистить таблицу</button>
             </div>
-            <table id="results-table">
-                <thead>
-                <tr>
-                    <th>X</th>
-                    <th>Y</th>
-                    <th>R</th>
-                    <th>Результат</th>
-                    <th>Время запроса</th>
-                    <th>Время выполнения (ms)</th>
-                </tr>
-                </thead>
-                <tbody>
-                <!-- Results will be inserted here by JavaScript -->
-                </tbody>
-            </table>
-        </div>
-
+            <div class="form-section">
+                <h3>Выберите R:</h3>
+                <div class="button-group" id="r-button-group">
+                    <button type="button" class="r-button" data-value="1">1</button>
+                    <button type="button" class="r-button" data-value="1.5">1.5</button>
+                    <button type="button" class="r-button" data-value="2">2</button>
+                    <button type="button" class="r-button" data-value="2.5">2.5</button>
+                    <button type="button" class="r-button" data-value="3">3</button>
+                </div>
+                <input type="hidden" id="r-input" name="r">
+            </div>
+            <button type="submit" id="submit-button">Проверить</button>
+        </form>
     </div>
+
+    <!-- NEW: Left column for controls -->
+    <div id="controls-panel">
+        <div id="graph-container">
+            <svg id="graph" viewBox="-150 -150 300 300" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6"
+                            orient="auto-start-reverse">
+                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#333"/>
+                    </marker>
+                </defs>
+                <g class="graph-area">
+                    <rect x="-100" y="0" width="100" height="100"></rect>
+                    <polygon points="0,0 50,0 0,100"></polygon>
+                    <path d="M 0 -50 A 50 50 0 0 1 50 0 L 0 0 Z"></path>
+                </g>
+                <line class="axis" x1="-140" y1="0" x2="140" y2="0" marker-end="url(#arrow)"></line>
+                <line class="axis" x1="0" y1="140" x2="0" y2="-140" marker-end="url(#arrow)"></line>
+                <text class="axis-label" x="135" y="-10">x</text>
+                <text class="axis-label" y="-135" x="10">y</text>
+                <g id="x-axis-ticks" class="tick-label" text-anchor="middle"></g>
+                <g id="y-axis-ticks" class="tick-label" text-anchor="end"></g>
+                <g id="dot-container"></g>
+            </svg>
+        </div>
+        <div id="error-message" class="error"></div>
+    </div>
+
+    <!-- NEW: Right column for results -->
+    <div id="results-panel">
+        <div class="results-header">
+            <h2>Результаты</h2>
+            <button type="button" id="clear-button">Очистить таблицу</button>
+        </div>
+        <table id="results-table">
+            <thead>
+            <tr>
+                <th>X</th>
+                <th>Y</th>
+                <th>R</th>
+                <th>Результат</th>
+                <th>Время запроса</th>
+                <th>Время выполнения (ms)</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Results will be inserted here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 <script src="script.js"></script>

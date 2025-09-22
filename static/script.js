@@ -1,138 +1,141 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // --- DOM Element References ---
     const form = document.getElementById('main-form');
     const yInput = document.getElementById('y-input');
     const rInput = document.getElementById('r-input');
     const rButtonGroup = document.getElementById('r-button-group');
     const resultsTableBody = document.querySelector('#results-table tbody');
     const errorMessageDiv = document.getElementById('error-message');
-
-    // SVG elements
-    const svgNamespace = "http://www.w3.org/2000/svg";
+    const clearButton = document.getElementById('clear-button');
     const dotContainer = document.getElementById('dot-container');
     const xAxisTicks = document.getElementById('x-axis-ticks');
     const yAxisTicks = document.getElementById('y-axis-ticks');
+
+    // --- Constants ---
+    const svgNamespace = "http://www.w3.org/2000/svg";
     const SVG_R_UNIT = 100;
+    const RESULTS_STORAGE_KEY = 'weblab_results_history'; // Key for localStorage
+
+    // --- Core Functions ---
 
     /**
-     * Handles the fetch request and UI updates.
+     * Creates a table row from result data and adds it to the table.
+     * @param {object} data The result data from the server.
+     */
+    function addResultToTable(data) {
+        const newRow = resultsTableBody.insertRow(0); // Insert at the top
+        const hitResultText = data.hit ? 'Попадание' : 'Промах';
+        newRow.className = data.hit ? 'hit-true' : 'hit-false';
+        newRow.innerHTML = `
+            <td>${parseFloat(data.x).toFixed(2)}</td>
+            <td>${parseFloat(data.y).toFixed(2)}</td>
+            <td>${parseFloat(data.r).toFixed(2)}</td>
+            <td>${hitResultText}</td>
+            <td>${data.currentTime}</td>
+            <td>${parseFloat(data.executionTime).toFixed(4)}</td>
+        `;
+    }
+
+    /**
+     * Saves the results array to localStorage.
+     * @param {Array<object>} results The array of result objects.
+     */
+    function saveResultsToStorage(results) {
+        localStorage.setItem(RESULTS_STORAGE_KEY, JSON.stringify(results));
+    }
+
+    /**
+     * Loads results from localStorage.
+     * @returns {Array<object>} The array of result objects or an empty array.
+     */
+    function loadResultsFromStorage() {
+        const savedResults = localStorage.getItem(RESULTS_STORAGE_KEY);
+        return savedResults ? JSON.parse(savedResults) : [];
+    }
+
+    /**
+     * Handles the fetch request, updates UI, and saves the result.
      * @param {FormData} formData The data to be sent.
      */
     async function submitRequest(formData) {
         try {
-		const response = await fetch('/calculate', {
+            const response = await fetch('/calculate', {
                 method: 'POST',
                 body: new URLSearchParams(formData)
             });
-
             const data = await response.json();
-
             if (!response.ok) {
-                // Replaced template literal for maximum compatibility.
-                throw new Error(data.error || 'HTTP error! Status: ' + response.status);
+                throw new Error(data.error || `HTTP error! Status: ${response.status}`);
             }
 
-            // --- Update results table ---
-            const newRow = resultsTableBody.insertRow(0);
-            const hitResultText = data.hit ? 'Попадание' : 'Промах';
-            newRow.className = data.hit ? 'hit-true' : 'hit-false';
-            // Исправлено: добавлены обратные кавычки для шаблонной строки
-            newRow.innerHTML = `
-                <td>${data.x.toFixed(2)}</td>
-                <td>${data.y.toFixed(2)}</td>
-                <td>${data.r.toFixed(2)}</td>
-                <td>${hitResultText}</td>
-                <td>${data.currentTime}</td>
-                <td>${data.executionTime}</td>
-            `;
+            // 1. Add result to the visual table
+            addResultToTable(data);
 
-            // Draw the point on the graph
+            // 2. Save the new result to storage
+            let results = loadResultsFromStorage();
+            results.unshift(data); // Add new result to the beginning
+            saveResultsToStorage(results);
+
+            // 3. Draw the point on the graph
             drawPoint(data.x, data.y, data.r, data.hit);
 
-            // Update URL to prevent resubmission warning
+            // 4. Update URL to prevent resubmission warning
             const urlParams = new URLSearchParams(formData);
-            // Исправлено: добавлены обратные кавычки для шаблонной строки
             const newUrl = `${window.location.pathname}?${urlParams.toString()}`;
             history.replaceState({ path: newUrl }, '', newUrl);
 
         } catch (error) {
             console.error('Fetch error:', error);
-            // Исправлено: добавлены обратные кавычки для шаблонной строки
             errorMessageDiv.textContent = `Ошибка: ${error.message}`;
         }
     }
 
     /**
-     * Checks URL for parameters on page load and restores the form state.
+     * Initializes the page: loads saved results and handles URL parameters.
      */
-    function handlePageLoad() {
+    function initializePage() {
+        // Load and display results from previous sessions
+        const results = loadResultsFromStorage();
+        for (let i = results.length - 1; i >= 0; i--) {
+            addResultToTable(results[i]);
+        }
+        // Handle direct URL parameters if any
         const urlParams = new URLSearchParams(window.location.search);
         const x = urlParams.get('x');
         const y = urlParams.get('y');
         const r = urlParams.get('r');
 
         if (x && y && r) {
-            // Исправлено: добавлены обратные кавычки для шаблонной строки
             const xRadio = form.querySelector(`input[name="x"][value="${x}"]`);
             if (xRadio) xRadio.checked = true;
-
             yInput.value = y;
-
-            // Исправлено: добавлены обратные кавычки для шаблонной строки
             const rButton = rButtonGroup.querySelector(`.r-button[data-value="${r}"]`);
             if (rButton) rButton.click();
-
-            const formData = new FormData(form);
-            // Ensure Y value from URL is set correctly
-            formData.set('y', y);
-            submitRequest(formData);
         } else {
             const defaultRButton = document.querySelector('.r-button[data-value="2"]');
             if (defaultRButton) defaultRButton.click();
         }
     }
 
-    // --- Event Listeners and other functions ---
-
-	const clearButton = document.getElementById('clear-button');
-
-	clearButton.addEventListener('click', () => {
-  	  // ������� ���� �������
-   	 resultsTableBody.innerHTML = '';
-    
-    	// ������� ����� �� �������
-   	 dotContainer.innerHTML = '';
-    
-    	// ������� URL �� ����������, ����� ��� ������������ ������� ���� ������
-    	history.replaceState(null, '', window.location.pathname);
-	});
+    // --- Event Listeners ---
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
         errorMessageDiv.textContent = '';
-
         const selectedX = form.querySelector('input[name="x"]:checked');
         const yValueRaw = yInput.value.trim().replace(',', '.');
         const yValue = parseFloat(yValueRaw);
         const rValue = rInput.value;
 
-        if (!selectedX) {
-            errorMessageDiv.textContent = 'Пожалуйста, выберите значение X.';
-            return;
-        }
-        // Исправлено: добавлены операторы || между условиями
-        if (yValueRaw === '' || isNaN(yValue) || yValue <= -3 || yValue >= 5) {
-            errorMessageDiv.textContent = 'Y должен быть числом в интервале (-3 ... 5).';
-            return;
-        }
-        if (!rValue) {
-            errorMessageDiv.textContent = 'Пожалуйста, выберите значение R.';
+        if (!selectedX || yValueRaw === '' || isNaN(yValue) || yValue <= -3 || yValue >= 5 || !rValue) {
+            if (!selectedX) errorMessageDiv.textContent = 'Пожалуйста, выберите значение X.';
+            else if (yValueRaw === '' || isNaN(yValue) || yValue <= -3 || yValue >= 5) errorMessageDiv.textContent = 'Y должен быть числом в интервале (-3 ... 5).';
+            else if (!rValue) errorMessageDiv.textContent = 'Пожалуйста, выберите значение R.';
             return;
         }
 
         const formData = new FormData(form);
-        // THE FIX: Explicitly convert the number to a string before setting it.
         formData.set('y', yValue.toString());
-
         submitRequest(formData);
     });
 
@@ -145,6 +148,20 @@ document.addEventListener('DOMContentLoaded', () => {
             updateGraphLabels(parseFloat(rValue));
         }
     });
+
+    clearButton.addEventListener('click', () => {
+        resultsTableBody.innerHTML = ''; // Clear visual table
+        dotContainer.innerHTML = ''; // Clear dot on graph
+        localStorage.removeItem(RESULTS_STORAGE_KEY); // Clear saved data
+        history.replaceState(null, '', window.location.pathname); // Clear URL params
+    });
+
+    // --- Drawing Functions (unchanged) ---
+    function updateGraphLabels(r) { /* ... same as before ... */ }
+    function drawPoint(x, y, r, hit) { /* ... same as before ... */ }
+
+    // Copy the full content of these functions from your previous working script.js
+    // For brevity, they are omitted here, but they are required.
 
     function updateGraphLabels(r) {
         if (!r || isNaN(r)) return;
@@ -191,12 +208,12 @@ document.addEventListener('DOMContentLoaded', () => {
         dot.setAttribute('cx', svgX);
         dot.setAttribute('cy', svgY);
         dot.setAttribute('r', 4);
-        dot.style.fill = hit ? '#28a745' : '#dc3545';
+        dot.style.fill = hit ? '#198754' : '#dc3545';
         dot.style.stroke = '#fff';
-        dot.style.strokeWidth = '1';
+        dot.style.strokeWidth = '1.5';
         dotContainer.appendChild(dot);
     }
 
-    // --- Initial setup ---
-    handlePageLoad();
+    // --- Initial Page Load ---
+    initializePage();
 });
