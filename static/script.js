@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
      */
     async function submitRequest(formData) {
         try {
-            const response = await fetch('/calculate', {
+		const response = await fetch('/calculate', {
                 method: 'POST',
                 body: new URLSearchParams(formData)
             });
@@ -92,6 +92,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Event Listeners and other functions ---
+
+	const clearButton = document.getElementById('clear-button');
+
+	clearButton.addEventListener('click', () => {
+  	  // Очищаем тело таблицы
+   	 resultsTableBody.innerHTML = '';
+    
+    	// Очищаем точку на графике
+   	 dotContainer.innerHTML = '';
+    
+    	// Очищаем URL от параметров, чтобы при перезагрузке таблица была пустой
+    	history.replaceState(null, '', window.location.pathname);
+	});
 
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
