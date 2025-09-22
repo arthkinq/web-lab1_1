@@ -1,46 +1,291 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Triangle Calculator</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Area Check</title>
+    <style>
+        /* General Body and Layout Styles */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            background: #fff;
+            padding: 2em;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 900px;
+        }
+
+        /* ID Selector for Header (Requirement) */
+        #page-header {
+            width: 100%;
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #4a4a4a;
+            border-radius: 8px;
+        }
+
+        /* Descendant Selector and specific header styles (Requirement) */
+        #page-header h1 {
+            font-family: fantasy; /* Required font */
+            color: #ffffff;      /* Required color */
+            font-size: 28px;     /* Required size */
+            margin: 0;
+            padding: 5px 0;
+        }
+        #page-header p {
+            color: #dcdcdc;
+            margin: 0;
+        }
+        
+        /* SVG Graph Styling */
+        #graph-container {
+            margin: 0 auto 20px;
+            max-width: 400px;
+        }
+        .graph-area {
+            fill: #5b99d4;
+            stroke: #3a75b3;
+            stroke-width: 1;
+        }
+        .axis {
+            stroke: #333;
+            stroke-width: 2;
+        }
+        .axis-label, .tick-label {
+            font-family: monospace;
+            font-size: 10px;
+            fill: #000;
+        }
+        .tick-line {
+            stroke: #888;
+            stroke-width: 1;
+        }
+        #result-dot {
+            transition: cx 0.3s, cy 0.3s;
+        }
+
+
+        /* Form and Input Styling */
+        #main-form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 2em;
+        }
+
+        .form-section {
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        /* Class selector (Requirement) */
+        .form-section h3 {
+            margin-top: 0;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+
+        /* Child selector (Requirement) */
+        .input-group > label {
+            display: block;
+            margin-bottom: 0.5em;
+        }
+
+        .radio-group, .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        /* Percentage-based margins (Requirement) */
+        #y-input {
+            width: 95%;
+            margin-left: 2.5%; /* Example of percentage margin */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+        }
+
+        .r-button {
+            padding: 10px 15px;
+            border: 1px solid #007bff;
+            background-color: #fff;
+            color: #007bff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s, color 0.2s;
+        }
+        .r-button:hover {
+            background-color: #e2f1ff;
+        }
+        .r-button.selected {
+            background-color: #007bff;
+            color: white;
+        }
+
+        #submit-button {
+            grid-column: 1 / -1; /* Span all columns */
+
+padding: 12px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        #submit-button:hover {
+            background-color: #218838;
+        }
+
+        .error {
+            color: #d9534f;
+            text-align: center;
+            margin-top: 1em;
+            min-height: 1.2em;
+            font-weight: bold;
+        }
+
+        /* Table Styling */
+        #results-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1em;
+        }
+        #results-table th, #results-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        #results-table thead {
+            background-color: #4a4a4a;
+            color: white;
+        }
+        #results-table tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #results-table .hit-true {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        #results-table .hit-false {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
 </head>
 <body>
+<header id="page-header">
+    <h1>Лабораторная работа №1</h1>
+    <p>ФИО: [Your Name] | Группа: [Your Group] | Вариант: [Your Variant]</p>
+</header>
 
 <div class="container">
-    <h1>Triangle Existence Calculator</h1>
 
-    <form id="triangle-form">
-        <div class="form-group">
-            <label for="x-input">Side X:</label>
-            <input type="number" id="x-input" step="any" required>
+    <!-- START: SVG Graph Replacement -->
+    <div id="graph-container">
+        <svg id="graph" viewBox="-150 -150 300 300" xmlns="http://www.w3.org/2000/svg">
+            <!-- Define arrowheads -->
+            <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="#333" />
+                </marker>
+            </defs>
+
+            <!-- Shaded Area (based on R=100 units) -->
+            <g class="graph-area">
+                <!-- Rectangle (3rd Quadrant) -->
+                <rect x="-100" y="0" width="100" height="100"></rect>
+                <!-- Triangle (4th Quadrant) -->
+                <polygon points="0,0 50,0 0,-100"></polygon> <!-- Corrected triangle points -->
+                <!-- Circle Sector (1st Quadrant) -->
+                <path d="M 0 50 A 50 50 0 0 1 50 0 L 0 0 Z"></path>
+            </g>
+
+            <!-- Axes -->
+            <line class="axis" x1="-140" y1="0" x2="140" y2="0" marker-end="url(#arrow)"></line>
+            <line class="axis" x1="0" y1="140" x2="0" y2="-140" marker-end="url(#arrow)"></line>
+
+            <!-- Axis Labels (X, Y) -->
+            <text class="axis-label" x="135" y="-10">x</text>
+            <text class="axis-label" y="-135" x="10">y</text>
+
+            <!-- Ticks and Labels (to be populated by JS) -->
+            <g id="x-axis-ticks" class="tick-label" text-anchor="middle"></g>
+            <g id="y-axis-ticks" class="tick-label" text-anchor="end"></g>
+
+            <!-- Result Dot (to be added by JS) -->
+            <g id="dot-container"></g>
+        </svg>
+    </div>
+    <!-- END: SVG Graph Replacement -->
+
+    <form id="main-form" method="POST">
+        <div class="form-section">
+            <h3>Выберите X:</h3>
+            <div class="radio-group">
+                <label><input type="radio" name="x" value="-2" checked> -2</label>
+                <label><input type="radio" name="x" value="-1.5"> -1.5</label>
+                <label><input type="radio" name="x" value="-1"> -1</label>
+                <label><input type="radio" name="x" value="-0.5"> -0.5</label>
+                <label><input type="radio" name="x" value="0"> 0</label>
+                <label><input type="radio" name="x" value="0.5"> 0.5</label>
+                <label><input type="radio" name="x" value="1"> 1</label>
+                <label><input type="radio" name="x" value="1.5"> 1.5</label>
+                <label><input type="radio" name="x" value="2"> 2</label>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="y-input">Side Y:</label>
-            <input type="number" id="y-input" step="any" required>
+        <div class="form-section">
+            <h3>Введите Y (-3 ... 5):</h3>
+            <div class="input-group">
+                <input type="text" id="y-input" name="y" placeholder="e.g., 2.5" required>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="r-input">Side R:</label>
-            <input type="number" id="r-input" step="any" required>
+        <div class="form-section">
+            <h3>Выберите R:</h3>
+            <div class="button-group" id="r-button-group">
+                <button type="button" class="r-button" data-value="1">1</button>
+                <button type="button" class="r-button" data-value="1.5">1.5</button>
+                <button type="button" class="r-button" data-value="2">2</button>
+                <button type="button" class="r-button" data-value="2.5">2.5</button>
+                <button type="button" class="r-button" data-value="3">3</button>
+            </div>
+            <input type="hidden" id="r-input" name="r">
         </div>
 
-        <button type="submit">Calculate</button>
+        <button type="submit" id="submit-button">Проверить</button>
     </form>
 
     <div id="error-message" class="error"></div>
 
-    <h2>Results</h2>
+    <h2>Результаты</h2>
     <table id="results-table">
         <thead>
         <tr>
-            <th>Side X</th>
-            <th>Side Y</th>
-            <th>Side R</th>
-            <th>Result</th>
-            <th>Response Time</th>
+            <th>X</th>
+            <th>Y</th>
+            <th>R</th>
+            <th>Результат</th>
+            <th>Время запроса</th>
+            <th>Время выполнения (ms)</th>
         </tr>
         </thead>
         <tbody>
