@@ -5,88 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Area Check</title>
     <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-color: #faf7fc;
+            --text-color: #2d1b36;
+            --header-bg: #1e293b;
+            --header-text: #f8f7f9;
+            --primary-accent: #8a4baf;
+            --primary-accent-hover: #7a3f9f;
+            --secondary-accent: #007bff;
+            --danger-color: #bf001a;
+            --danger-color-hover: #ff0018;
+            --hit-true-bg: #e6e9fa;
+            --hit-false-bg: #f9eaea;
+            --border-radius-std: 0.8em;
+            --font-size-base: 16px;
+        }
+
         body {
             font-family: fantasy, "Roboto", "Open Sans", Arial, sans-serif;
-            background-color: #faf7fc;
-            color: #2d1b36;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 90vh;
             margin: 0;
-            letter-spacing: 1px;
+            letter-spacing: 0.05rem;
             overflow-x: hidden;
+            font-size: var(--font-size-base);
         }
 
         #page-header {
             display: flex;
             justify-content: space-around;
             align-items: center;
-            width: 100%;
-            margin-bottom: 1%;
-            padding: 0.3%;
-            background-color: #1e293b;
-            color: #f8f7f9
+            width: 98%;
+            padding: 0.5rem 0;
+            background-color: var(--header-bg);
+            color: var(--header-text);
+            font-family: fantasy;
+            border-radius: 0 0 var(--border-radius-std) var(--border-radius-std);
         }
 
         #page-header h1 {
-            font-size: 1.5vw;
+            font-size: 1.8rem;
         }
 
         #page-header p {
-            font-size: 1vw;
+            font-size: 1.2rem;
         }
 
         #main-content {
             display: flex;
             flex-wrap: wrap;
-            gap: 1vw;
-            width: 90%;
-            justify-content: space-between;
+            gap: 1.5rem;
+            width: 100%;
+            justify-content: center;
+            margin-top: 1.5rem;
+            padding:0 0 2rem 2rem;
+            max-width: 90vw;
         }
 
-        #controls-panel {
-            width: 30%;
+        .panel {
+            flex-grow: 1;
+            flex-basis: 400px;
+            padding: 1.5vw;
+            background-color: #fff;
+            border-radius: var(--border-radius-std);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            max-width: 95vw;
+            height: min-content;
         }
 
-        #results-panel {
-            width: 35%;
-        }
-
-        #controls-panel1 {
-            width: 32%;
-        }
-
-
-        /* --- NEW: Header for results panel --- */
         .results-header {
             display: flex;
-            justify-content: space-between; /* Заголовок слева, кнопка справа */
+            justify-content: space-between;
             align-items: center;
-            margin-bottom: 1%;
+            margin-bottom: 1rem;
+            max-width: 100%;
         }
 
         .results-header h2 {
             margin: 0;
         }
 
-        /* --- NEW: Clear button style --- */
         #clear-button {
-            padding: 2% 11%;
-            background-color: #bf001a;
+            padding: 0.6rem 1.2rem;
+            background-color: var(--danger-color);
             color: white;
             border: none;
-            border-radius: 0.8em;
+            border-radius: var(--border-radius-std);
             cursor: pointer;
-            font-size: 0.9em;
+            font-size: 0.9rem;
             transition: background-color 0.2s;
         }
 
         #clear-button:hover {
-            background-color: #ff0018;
+            background-color: var(--danger-color-hover);
         }
 
-        /* SVG Graph Styling */
         #graph-container {
             margin: 0 auto 2%;
         }
@@ -117,53 +140,57 @@
             transition: cx 0.3s, cy 0.3s;
         }
 
-        /* Form and Input Styling */
         #main-form {
             display: flex;
             flex-direction: column;
-            font-size: 2vh;
+            gap: 1.5rem;
+            font-size: 1rem;
         }
 
         .form-section {
             padding: 2%;
-            border: 1px solid rgb(122, 63, 159);
             border-radius: 0.8em;
             margin-bottom: 2%;
         }
 
         .form-section h3 {
-            border-bottom: 2px solid rgb(122, 63, 159);
-            padding-bottom: 3%;
+            border-bottom: 2px solid var(--primary-accent);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
         }
 
         .input-group > label {
             display: block;
-            margin-bottom: 1%;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
         }
 
         .radio-group, .button-group {
             display: flex;
             flex-wrap: wrap;
-            justify-content: space-between;
-            font-size: 2vh;
+            gap: 0.5rem;
+            column-gap: 2.1rem;
+            font-size: 1rem;
         }
+
 
         .button-group {
             justify-content: space-around;
+            column-gap: 0.5em;
         }
 
         #y-input {
-            width: 90%;
-            margin-left: 2.5%;
-            padding: 2%;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0.75rem;
             border: 1px solid #ccc;
-            border-radius: 0.8em;
+            border-radius: var(--border-radius-std);
             font-size: 1em;
         }
 
         .r-button {
-            padding: 3% 4%;
-            border: 1px solid #007bff;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--secondary-accent);
             background-color: #fff;
             border-radius: 0.4em;
             cursor: pointer;
@@ -175,24 +202,24 @@
         }
 
         .r-button.selected {
-            background-color: #007bff;
+            background-color: var(--secondary-accent);
             color: white;
         }
 
         #submit-button {
-            /*grid-column: 1 / -1;*/
-            padding: 4% 2%;
-            background-color: #8a4baf;
+            padding: 1rem;
+            background-color: var(--primary-accent);
             color: white;
             border: none;
-            border-radius:0.8em;
+            border-radius: var(--border-radius-std);
             cursor: pointer;
-            font-size: 1.1em;
+            font-size: 1.1rem;
             font-weight: bold;
+            transition: background-color 0.2s;
         }
 
         #submit-button:hover {
-            background-color: #7a3f9f;
+            background-color: var(--primary-accent-hover);
         }
 
         .error {
@@ -203,55 +230,63 @@
             font-weight: bold;
         }
 
-        /* Table Styling */
         #results-table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 1%;
-            margin-bottom: 10%;
+            margin-top: 1rem;
         }
 
         #results-table th, #results-table td {
             border: 1px solid #ddd;
-            padding: 12px;
+            padding: 0.75rem;
             text-align: center;
-            min-width: 3vw;
+            min-width: 4vw;
+        }
+
+        #results-table th:nth-child(4) {
+            min-width: 7vw;
         }
 
         #results-table thead {
-            background-color: #1e293b;
-            color: white;
+            background-color: var(--header-bg);
+            color: var(--header-text);
         }
 
         #results-table .hit-true {
-            background-color: #bbc2ea;
-            color: #1e293b;
+            background-color: var(--hit-true-bg);
         }
 
         #results-table .hit-false {
-            background-color: #edb0b0;
-            color: #000000;
+            background-color: var(--hit-false-bg);
         }
+
+        #table-wrapper {
+            height: 68vh;
+            overflow-y: auto;
+            overflow-x: hidden;
+            scrollbar-gutter: stable both-edges;
+            padding-right: 1.3rem;
+        }
+
     </style>
 </head>
 <body>
 <header id="page-header">
     <h1>Лабораторная работа №1</h1>
-    <p>ФИО: Сланов Артур | Группа: P3222 | Вариант: 467495</p>
+    <p>ФИО: Сланов Артур Робертович | Группа: P3222 | Вариант: 467495</p>
 </header>
 
-
-<div id="main-content">
-    <div id="controls-panel1">
+<main id="main-content">
+    <div id="controls-panel" class="panel">
         <form id="main-form" method="POST">
             <div class="form-section">
                 <h3>Выберите X:</h3>
                 <div class="radio-group">
-                    <label><input type="radio" name="x" value="-2" checked> -2</label>
+                    <label><input type="radio" name="x" value="-2"> -2</label>
                     <label><input type="radio" name="x" value="-1.5"> -1.5</label>
                     <label><input type="radio" name="x" value="-1"> -1</label>
                     <label><input type="radio" name="x" value="-0.5"> -0.5</label>
-                    <label><input type="radio" name="x" value="0"> 0</label>
+                    <label><input type="radio" name="x" value="0" checked> 0</label>
                     <label><input type="radio" name="x" value="0.5"> 0.5</label>
                     <label><input type="radio" name="x" value="1"> 1</label>
                     <label><input type="radio" name="x" value="1.5"> 1.5</label>
@@ -259,9 +294,9 @@
                 </div>
             </div>
             <div class="form-section">
-                <h3>Введите Y (-3 ... 5):</h3>
+                <h3><label for="y-input">Введите Y (-3 ... 5):</label></h3>
                 <div class="input-group">
-                    <input type="text" id="y-input" name="y" placeholder="e.g., 2.5" required>
+                    <input type="number" id="y-input" name="y" placeholder="e.g., 2.5" required min="-3" max="5" step="0.00000000000000001">
 
                 </div>
             </div>
@@ -280,8 +315,7 @@
         </form>
     </div>
 
-    <!-- NEW: Left column for controls -->
-    <div id="controls-panel">
+    <div id="graph" class="panel">
         <div id="graph-container">
             <svg id="graph" viewBox="-150 -150 300 300" xmlns="http://www.w3.org/2000/svg">
                 <defs>
@@ -307,30 +341,30 @@
         <div id="error-message" class="error"></div>
     </div>
 
-    <!-- NEW: Right column for results -->
-    <div id="results-panel">
+    <div id="results-panel" class="panel">
         <div class="results-header">
             <h2>Результаты</h2>
             <button type="button" id="clear-button">Очистить таблицу</button>
         </div>
-        <table id="results-table">
-            <thead>
-            <tr>
-                <th>X</th>
-                <th>Y</th>
-                <th>R</th>
-                <th>Результат</th>
-                <th>Время запроса</th>
-                <th>Время выполнения (ms)</th>
-            </tr>
-            </thead>
-            <tbody>
-            <!-- Results will be inserted here by JavaScript -->
-            </tbody>
-        </table>
+        <div id="table-wrapper">
+            <table id="results-table">
+                <thead>
+                <tr>
+                    <th>X</th>
+                    <th>Y</th>
+                    <th>R</th>
+                    <th>Результат</th>
+                    <th>Время запроса</th>
+                    <th>Время выполнения (ms)</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
     </div>
 
-</div>
+</main>
 
 <script src="script.js"></script>
 </body>

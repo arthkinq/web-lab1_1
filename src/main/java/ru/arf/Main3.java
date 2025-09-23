@@ -1,7 +1,6 @@
 package ru.arf;
 
-import com.fastcgi.FCGIInterface;
-
+import com.fastcgi.FCGIInterface; // Библиотека все еще нужна для парсинга
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -13,15 +12,12 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class MainH {
+public class Main3 {
 
     public static void main(String[] args) {
-        var fcgi = new FCGIInterface();
-        System.err.println("FastCGI Server started, waiting for requests...");
-
-        while (fcgi.FCGIaccept() >= 0) {
+        // FCGIaccept все еще работает для чтения CGI-данных
+        if (new FCGIInterface().FCGIaccept() >= 0) {
             long startTime = System.nanoTime();
-
             try {
                 int contentLength = Integer.parseInt(System.getProperties().getProperty("CONTENT_LENGTH", "0"));
                 if (contentLength <= 0) throw new IllegalArgumentException("No POST data received.");
@@ -42,30 +38,18 @@ public class MainH {
                 double executionTimeMs = (double)(System.nanoTime() - startTime) / 1_000_000.0;
 
                 String jsonBody = String.format(Locale.US,
-                        "{\"x\":%.2f, \"y\":%.2f, \"r\":%.2f, \"hit\":%b, \"currentTime\":\"%s\", \"executionTime\":%.3f}",
+                        "{\"x\":%.2f, \"y\":%.2f, \"r\":%.2f, \"hit\":%b, \"currentTime\":\"%s\", \"executionTime\":%.4f}",
                         x, y, r, hit, currentTime, executionTimeMs
                 );
 
-                // ЭТО ВАЖНО: Мы снова генерируем ПОЛНЫЙ HTTP-ответ из-за флага -nph
-                String httpResponse = "HTTP/1.1 200 OK\r\n" +
-                        "Content-Type: application/json\r\n" +
-                        "Content-Length: " + jsonBody.getBytes(StandardCharsets.UTF_8).length + "\r\n" +
-                        "\r\n" + // Критически важная пустая строка
-                        jsonBody;
-
-                System.out.print(httpResponse);
+                // ВЫВОДИМ ТОЛЬКО ТЕЛО JSON
+                System.out.print(jsonBody);
 
             } catch (Exception e) {
-                String reason = "Invalid or missing parameters.";
-                String jsonBody = String.format("{\"error\":\"%s\"}", reason);
-
-                String httpErrorResponse = "HTTP/1.1 400 Bad Request\r\n" +
-                        "Content-Type: application/json\r\n" +
-                        "Content-Length: " + jsonBody.getBytes(StandardCharsets.UTF_8).length + "\r\n" +
-                        "\r\n" +
-                        jsonBody;
-
-                System.out.print(httpErrorResponse);
+                // В случае ошибки мы не можем отправить код 400, поэтому отправляем JSON с ошибкой
+                String reason = e.getMessage() != null ? e.getMessage() : "Invalid or missing parameters.";
+                String jsonBody = String.format(Locale.US, "{\"error\":\"%s\"}", reason);
+                System.out.print(jsonBody);
             } finally {
                 System.out.flush();
             }
